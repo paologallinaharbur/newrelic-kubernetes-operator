@@ -7,6 +7,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var defaultExpirationDuration = 360
+
 // AlertsNrqlConditionSpec defines the desired state of AlertsNrqlCondition
 type AlertsNrqlConditionSpec struct {
 	AlertsGenericConditionSpec `json:",inline"`
@@ -41,7 +43,7 @@ type AlertsNrqlSpecificSpec struct {
 
 // AlertsNrqlConditionTerm represents the terms of a New Relic alert condition.
 type AlertsNrqlConditionTerm struct {
-	Operator             alerts.AlertsNrqlConditionTermsOperator `json:"operator,omitempty"`
+	Operator             alerts.AlertsNRQLConditionTermsOperator `json:"operator,omitempty"`
 	Priority             alerts.NrqlConditionPriority            `json:"priority,omitempty"`
 	Threshold            string                                  `json:"threshold,omitempty"`
 	ThresholdDuration    int                                     `json:"threshold_duration,omitempty"`
@@ -87,7 +89,12 @@ func (in AlertsNrqlConditionSpec) ToNrqlConditionInput() alerts.NrqlConditionInp
 	conditionInput.Nrql = in.Nrql
 	conditionInput.RunbookURL = in.RunbookURL
 	conditionInput.ViolationTimeLimit = in.ViolationTimeLimit
-
+	conditionInput.Expiration = &alerts.AlertsNrqlConditionExpiration{
+		ExpirationDuration:          &defaultExpirationDuration,
+		CloseViolationsOnExpiration: false,
+		OpenViolationOnExpiration:   true,
+	}
+	
 	if in.ValueFunction != nil {
 		// f := alerts.NrqlConditionValueFunction(in.ValueFunction)
 		conditionInput.ValueFunction = in.ValueFunction

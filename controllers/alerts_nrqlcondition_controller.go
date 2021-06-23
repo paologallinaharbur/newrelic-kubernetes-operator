@@ -195,6 +195,7 @@ func (r *AlertsNrqlConditionReconciler) SetupWithManager(mgr ctrl.Manager) error
 }
 
 func (r *AlertsNrqlConditionReconciler) writeNewRelicAlertCondition(ctx context.Context, req ctrl.Request, alertsClient interfaces.NewRelicAlertsClient, condition nrv1.AlertsNrqlCondition) {
+	r.Log.Info("executing new version of ToNrqlConditionInput")
 	updateInput := condition.Spec.ToNrqlConditionInput()
 
 	if condition.Status.ConditionID != "" && !reflect.DeepEqual(&condition.Spec, condition.Status.AppliedSpec) {
